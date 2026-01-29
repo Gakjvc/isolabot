@@ -18,11 +18,16 @@ const commands = [
   new SlashCommandBuilder()
     .setName('ping')
     .setDescription('Responde com Pong!')
-    .toJSON()
+    .toJSON(),
+
+  new SlashCommandBuilder()
+  .setName('bolsonaro')
+  .setDescription('Prosopa Putaria e ponto final')
+  .toJSON()
 ];
 (async () => {
   try {
-    console.log('🔄 Registrando comando /ping...');
+    console.log('🔄 Registrando comandos...');
     await rest.put(
       Routes.applicationCommands(CLIENT_ID),
       { body: commands },
@@ -54,11 +59,26 @@ client.on('interactionCreate', async interaction => {
   }
 });
 
-  
+client.on('interactionCreate', async interaction => {
+  if (!interaction.isChatInputCommand()) return;
+
+  if (interaction.commandName === 'bolsonaro') {
+    await  interaction.reply('fudido'),
+    tocaMusicaSlash(interaction.member, 'audios/bolsonaro.mp3');
+  }
+});
+
+  const gif = "https://tenor.com/view/jojos-bizarre-adventure-jojos-traitors-requiem-golden-wind-vento-aureo-gif-24253226";
   const silvaId = "@173421126901432320";
   client.on('messageCreate', message => {
     if (message.content.includes(silvaId) && message.mentions.users.size === 1) {
     message.reply("https://cdn.discordapp.com/attachments/498319060568899584/1407476468065374208/image.png?ex=68a63e1b&is=68a4ec9b&hm=bb2fdaad07175dd326004da6f31675c39f1607161c4ab5355575ec53c540a424&");
+  }
+  if(message.content === gif) {
+    message.channel.send(gif);
+  }
+  if(message.content === '!infinite') {
+    message.channel.send(gif);
   }
   if(message.content === '!help') {
     message.reply("Comandos disponíveis:\n!mag\n!escusado\n!pt\n!bolsonaro\n!roast\n!nununajungle");
@@ -82,9 +102,13 @@ client.on('interactionCreate', async interaction => {
     case '!nununajungle':
     tocaMusica(message, 'audios/nununajungle.mp3');
       break;
+    case '!shen':
+    tocaMusica(message, 'audios/shen.mp3');
+      break;
     }
 }); 
             
+
 const { createAudioPlayer, createAudioResource, joinVoiceChannel, AudioPlayerStatus } = require('@discordjs/voice');
 function tocaMusica(message, arquivo) {
   const voiceChannel = message.member?.voice.channel;
@@ -104,5 +128,24 @@ function tocaMusica(message, arquivo) {
 
     player.on(AudioPlayerStatus.Playing, () => console.log('🎶 Tocando áudio!'));
 }
+
+function tocaMusicaSlash(user, arquivo) {
+  const voiceChannel = user.voice.channel;
+    if (!voiceChannel) return;
+    const connection = joinVoiceChannel({
+      channelId: voiceChannel.id,
+      guildId: voiceChannel.guild.id,
+      adapterCreator: voiceChannel.guild.voiceAdapterCreator
+    });
+
+    // Criar player e recurso
+    const player = createAudioPlayer();
+    const resource = createAudioResource(path.join(__dirname, arquivo)); // ou .wav
+    player.play(resource);
+    connection.subscribe(player);
+
+    player.on(AudioPlayerStatus.Playing, () => console.log('🎶 Tocando áudio!'));
+}
+
 
 client.login(TOKEN);
